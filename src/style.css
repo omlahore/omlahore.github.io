@@ -113,26 +113,56 @@ a {
   position: fixed;
   inset: 0;
   z-index: 150;
-  display: grid;
-  place-items: center;
-  background: var(--field);
+  background: var(--ink);
+  color: var(--field);
   pointer-events: none;
+  --hole: radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent var(--h, 0px), #000 calc(var(--h, 0px) + 1px));
+  -webkit-mask: var(--hole);
+  mask: var(--hole);
 }
 
 .intro__mark {
-  width: 64px;
-  height: 64px;
-  fill: var(--ink);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(96px, 13vw, 168px);
+  height: auto;
+  translate: -50% -50%;
+  overflow: visible;
 }
 
-.intro__mark .v {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
+.intro__mark [pathLength] {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
 }
 
-.intro__mark .h {
-  transform-box: fill-box;
-  transform-origin: 0 50%;
+.intro__term {
+  position: absolute;
+  left: 24px;
+  bottom: 20px;
+  margin: 0;
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .intro__term {
+    top: 20px;
+    bottom: auto;
+  }
+}
+
+.intro__prompt {
+  opacity: 0.6;
+}
+
+.intro__caret {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.1em;
+  margin-left: 2px;
+  vertical-align: -0.2em;
+  background: currentColor;
+  animation: pulse 1s steps(2, start) infinite;
 }
 
 .intro__count {
@@ -213,10 +243,9 @@ a {
   padding: 0;
 }
 
-.head__mark svg {
-  width: 26px;
-  height: 26px;
-  fill: var(--ink);
+.head__logo {
+  width: 30px;
+  height: 30px;
 }
 
 .head__nav {

@@ -36,6 +36,39 @@ export function applyHue(h: number) {
   document.dispatchEvent(new Event("palettechange"));
 }
 
+// The tab icon follows the page color: the mark in the current ink on the current field.
+let iconAt = -Infinity;
+const MARK = new Path2D("M18 84V20L40 48.9M82 84V20L60 48.9");
+const icon = document.createElement("canvas");
+icon.width = icon.height = 64;
+const drawIcon = () => {
+  const link = document.querySelector<HTMLLinkElement>("link[data-live-icon]");
+  const ctx = icon.getContext("2d");
+  if (!link || !ctx) return;
+  const css = getComputedStyle(document.documentElement);
+  ctx.clearRect(0, 0, 64, 64);
+  ctx.fillStyle = css.getPropertyValue("--field").trim();
+  ctx.beginPath();
+  ctx.roundRect(0, 0, 64, 64, 14);
+  ctx.fill();
+  ctx.strokeStyle = css.getPropertyValue("--ink").trim();
+  ctx.lineWidth = 12;
+  ctx.lineCap = ctx.lineJoin = "round";
+  ctx.setTransform(0.55, 0, 0, 0.55, 4.5, 3.4);
+  ctx.stroke(MARK);
+  ctx.beginPath();
+  ctx.arc(50, 62, 16.5, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  link.href = icon.toDataURL("image/png");
+};
+document.addEventListener("palettechange", () => {
+  const now = performance.now();
+  if (now - iconAt < 3000) return;
+  iconAt = now;
+  drawIcon();
+});
+
 export function initPalette(isReduced: boolean) {
   reduced = isReduced;
   let start = Math.random() * 360;

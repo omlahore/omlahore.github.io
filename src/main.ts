@@ -113,23 +113,42 @@ const done = () => {
 if (reduced) {
   done();
 } else {
+  // two branches draw in and merge into the O, then the O opens into the page
   const split = new SplitText(title.querySelectorAll(".hero__word"), { type: "chars", charsClass: "char" });
-  const mark = intro.querySelector("[data-intro-mark]")!;
+  const branches = intro.querySelectorAll("[data-intro-b]");
+  const ring = intro.querySelector<SVGCircleElement>("[data-intro-o]")!;
+  const typed = intro.querySelector<HTMLElement>("[data-intro-type]")!;
   const count = intro.querySelector<HTMLElement>("[data-intro-count]")!;
-  const c = { v: 0 };
+  const o = ring.getBoundingClientRect();
+  const cx = o.left + o.width / 2;
+  const cy = o.top + o.height / 2;
+  const far = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
+  const hole = { h: (o.width / 2) * (10.5 / 22.5) };
+  intro.style.setProperty("--x", `${cx}px`);
+  intro.style.setProperty("--y", `${cy}px`);
+  const cmd = "open omlahore.github.io";
+  const c = { v: 0, k: 0 };
   const tl = gsap.timeline({ delay: 0.1, onComplete: done });
   tl.set("[data-frame]", { scale: 0 })
     .set("[data-head]", { yPercent: -120 })
     .set(split.chars, { yPercent: 110 })
     .set(".hero__star", { scale: 0, rotate: -180 })
-    .to(c, { v: 100, duration: 1.3, ease: "power2.inOut", onUpdate: () => (count.textContent = String(Math.round(c.v))) }, 0)
-    .from(mark.querySelectorAll(".v"), { scaleY: 0, duration: 0.7, ease: "power4.inOut", stagger: 0.12 }, 0)
-    .from(mark.querySelectorAll(".h"), { scaleX: 0, duration: 0.45, ease: "power4.inOut" }, 0.55)
-    .to([mark, count], { opacity: 0, duration: 0.35, ease: "power2.in" }, 1.35)
-    .to(intro, { yPercent: -100, duration: 0.9, ease: "expo.inOut" }, 1.45)
-    .to("[data-frame]", { scale: 1, duration: 1.4, ease: "power3.inOut", stagger: 0.06 }, 1.4)
-    .to("[data-head]", { yPercent: 0, duration: 1.1, ease: "expo.out" }, 1.85)
-    .to(split.chars, { yPercent: 0, duration: 1.1, ease: "expo.out", stagger: 0.035 }, 1.9)
-    .to(".hero__star", { scale: 1, rotate: 0, duration: 1.2, ease: "expo.out" }, 2.05)
-    .from(".hero__meta span", { opacity: 0, y: 10, duration: 0.6, stagger: 0.08 }, 2.25);
+    .set(ring, { opacity: 0 })
+    .to(c, { v: 100, duration: 1.7, ease: "power2.inOut", onUpdate: () => (count.textContent = String(Math.round(c.v))) }, 0)
+    .to(c, { k: cmd.length, duration: 0.8, ease: "none", onUpdate: () => (typed.textContent = cmd.slice(0, Math.round(c.k))) }, 0.15)
+    .to(branches, { strokeDashoffset: 0, duration: 0.9, ease: "power3.inOut" }, 0.2)
+    .set(ring, { opacity: 1 }, 0.95)
+    .to(ring, { strokeDashoffset: 0, duration: 0.7, ease: "power3.out" }, 0.95)
+    .to(".intro__term, .intro__count", { opacity: 0, duration: 0.3 }, 1.75)
+    .to(hole, {
+      h: far,
+      duration: 1.1,
+      ease: "expo.in",
+      onUpdate: () => intro.style.setProperty("--h", `${hole.h}px`),
+    }, 1.8)
+    .to("[data-frame]", { scale: 1, duration: 1.4, ease: "power3.inOut", stagger: 0.06 }, 2.4)
+    .to("[data-head]", { yPercent: 0, duration: 1.1, ease: "expo.out" }, 2.6)
+    .to(split.chars, { yPercent: 0, duration: 1.1, ease: "expo.out", stagger: 0.035 }, 2.65)
+    .to(".hero__star", { scale: 1, rotate: 0, duration: 1.2, ease: "expo.out" }, 2.8)
+    .from(".hero__meta span", { opacity: 0, y: 10, duration: 0.6, stagger: 0.08 }, 2.95);
 }
